@@ -1,0 +1,1 @@
+Extracting any CSV files from the configured Azure Blob Storage Container

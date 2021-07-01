@@ -1,0 +1,32 @@
+{
+    "type": "object",
+    "title": "Parameters",
+    "required": [
+        "account_name",
+        "#account_key",
+        "container_name"
+    ],
+    "properties": {
+        "account_name": {
+            "description": "Azure Storage Resources Account Name",
+            "type": "string",
+            "title": "Account Name",
+            "minLength": 1,
+            "propertyOrder": 1,
+            "default": "STORAGE_NAME"
+        },
+        "#account_key": {
+            "description": "Azure Storage Access Key",
+            "type": "string",
+            "title": "Access Key",
+            "propertyOrder": 2
+        },
+        "container_name": {
+            "type": "string",
+            "title": "Container Name",
+            "description": "Azure Storage Container Name",
+            "minLength": 1,
+            "propertyOrder": 4
+        }
+    }
+}

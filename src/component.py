@@ -17,13 +17,13 @@ import os
 # configuration variables
 KEY_ACCOUNT_NAME = 'account_name'
 KEY_ACCOUNT_KEY = '#account_key'
-KEY_CONTAINER_NAME = 'container_name'
+KEY_FILE_SYSTEM = 'file_system'
 KEY_NEW_FILE_ONLY = 'new_files_only'
 KEY_FILE = 'file'
 KEY_FILE_NAME = 'file_name'
 KEY_ADD_TIMESTAMP = "add_timestamp"
 
-REQUIRED_PARAMETERS = [KEY_ACCOUNT_NAME, KEY_ACCOUNT_KEY, KEY_CONTAINER_NAME, KEY_FILE]
+REQUIRED_PARAMETERS = [KEY_ACCOUNT_NAME, KEY_ACCOUNT_KEY, KEY_FILE_SYSTEM, KEY_FILE]
 REQUIRED_IMAGE_PARS = []
 
 
@@ -37,7 +37,7 @@ class Component(ComponentBase):
 
         account_name = params.get(KEY_ACCOUNT_NAME)
         account_key = params.get(KEY_ACCOUNT_KEY)  # noqa
-        container_name = params.get(KEY_CONTAINER_NAME)
+        file_system = params.get(KEY_FILE_SYSTEM)
         file = params.get(KEY_FILE)
         file_pattern = file.get(KEY_FILE_NAME)
         add_timestamp = file.get(KEY_ADD_TIMESTAMP, False)
@@ -54,9 +54,10 @@ class Component(ComponentBase):
             logging.info(f'Extracting from: {last_run_timestamp}')
 
         # Initializing file Container client
-        azure_client = AzureDataLakeClient(account_name, account_key, container_name)
+        azure_client = AzureDataLakeClient(account_name, account_key, file_system)
 
         file_list = azure_client.list_directory_contents("")
+        qualified_file_list = []
         try:
             qualified_file_list = self.qualify_files(file_pattern, file_list, last_run_timestamp)
         except StorageErrorException as e:
@@ -79,7 +80,8 @@ class Component(ComponentBase):
         state = {'lastRunTimestamp': int(datetime.utcnow().timestamp())}
         self.write_state_file(state)
 
-    def qualify_files(self, file_pattern, file_list, last_run_timestamp):
+    @staticmethod
+    def qualify_files(file_pattern, file_list, last_run_timestamp):
         qualified_files = []
         qualified_files_short = []
 

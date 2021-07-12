@@ -2,9 +2,9 @@ from azure.storage.filedatalake import DataLakeServiceClient
 
 
 class AzureDataLakeClient():
-    def __init__(self, account_name, account_key, container_name):
+    def __init__(self, account_name, account_key, file_system):
         service_client = self.initialize_storage_account(account_name, account_key)
-        self.file_system_client = service_client.get_file_system_client(file_system=container_name)
+        self.file_system_client = service_client.get_file_system_client(file_system=file_system)
 
     @staticmethod
     def initialize_storage_account(storage_account_name, storage_account_key):

@@ -12,6 +12,7 @@ from azure.core.exceptions import ServiceRequestError
 from keboola.component.base import ComponentBase, UserException
 from azure_data_lake.client import AzureDataLakeClient
 from azure.storage.filedatalake._generated.models._models_py3 import StorageErrorException
+import os
 
 # configuration variables
 KEY_ACCOUNT_NAME = 'account_name'
@@ -27,16 +28,6 @@ REQUIRED_IMAGE_PARS = []
 
 
 class Component(ComponentBase):
-    """
-        Extends base class for general Python components. Initializes the CommonInterface
-        and performs configuration validation.
-
-        For easier debugging the data folder is picked up by default from `../data` path,
-        relative to working directory.
-
-        If `debug` parameter is present in the `config.json`, the default logger is set to verbose DEBUG mode.
-    """
-
     def __init__(self):
         super().__init__(required_parameters=REQUIRED_PARAMETERS,
                          required_image_parameters=REQUIRED_IMAGE_PARS)
@@ -97,12 +88,13 @@ class Component(ComponentBase):
             file_name = file.name
             file_last_modified = dateparser.parse(file.last_modified)
             file_last_modified = int(datetime.timestamp(file_last_modified))
+            root, ext = os.path.splitext(file_name)
 
             match_bool = fnmatch2(file_name, file_pattern)
             logging.debug(
                 f'Matched: {match_bool} | {file_pattern} <> {file_name}')
 
-            if match_bool is True and ".csv" in file_name:
+            if match_bool is True and ext:
                 file_obj = {}
                 if last_run_timestamp:
                     if file_last_modified >= int(last_run_timestamp):

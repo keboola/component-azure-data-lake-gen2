@@ -1,83 +1,95 @@
-KBC Component
+Azure Data Lake Gen2 Extractor
 =============
 
-Description
+This component can be used to extract files from Azure Data Lake Gen2 and apply after processors to save them into storage.
 
 **Table of contents:**
 
 [TOC]
 
-Functionality notes
-===================
-
 Prerequisites
 =============
 
-Get the API token, register application, etc.
+Prepare an account name, account key, and file system.
 
-Features
-========
-
-| **Feature**             | **Note**                                      |
-|-------------------------|-----------------------------------------------|
-| Generic UI form         | Dynamic UI form                               |
-| Row Based configuration | Allows structuring the configuration in rows. |
-| oAuth                   | oAuth authentication enabled                  |
-| Incremental loading     | Allows fetching data in new increments.       |
-| Backfill mode           | Support for seamless backfill setup.          |
-| Date range filter       | Specify date range.                           |
-
-Supported endpoints
-===================
-
-If you need more endpoints, please submit your request to
-[ideas.keboola.com](https://ideas.keboola.com/)
 
 Configuration
 =============
+ - Account Name (account_name) - [REQ] Azure Data Lake Gen2 Account Name
+ - Access Key (#account_key) - [REQ] Azure Data Lake Gen2 Access Key
+ - File System (file_system) - [REQ] Azure Data Lake Gen2 file system (file-system-name means the name of the container,
+   it is the data lake gen2 name for it)
+ - File - [REQ] file dictionary:
+    - file_name [REQ] name of file, or pattern (dir/text.csv will find the text csv file in dir , 
+      dir/text_*.csv will find all csv files starting with text_ in the dir)
+    - new_files_only [REQ] - if true, will only fetch files that have been updated since the lst run of the component
+    - add_timestamp [REQ] - if true, will append the timestamp infront of the name of the file
+   
+Sample Configuration
+=============
 
-Param 1
--------
-
-Param 2
--------
-
-Output
-======
-
-List of tables, foreign keys, schema.
-
-Development
------------
-
-If required, change local data folder (the `CUSTOM_FOLDER` placeholder) path to
-your custom path in the docker-compose file:
-
+### Configuration Parameters
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-    volumes:
-      - ./:/code
-      - ./CUSTOM_FOLDER:/data
+  {
+    "account_name" : "YOUR_ACCOUNT_NAME",
+    "#account_key" : "YOUR_KEY",
+    "file_system" : "container",
+    "file": {
+      "file_name": "some_dir_in_container/file.csv",
+      "new_files_only": false,
+      "add_timestamp": true
+    }
+  }
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Clone this repository, init the workspace and run the component with following
-command:
-
+### Processors
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-git clone repo_path my-new-component
-cd my-new-component
-docker-compose build
-docker-compose run --rm dev
+{
+  "before": [],
+  "after": [
+    {
+      "definition": {
+        "component": "keboola.processor-move-files"
+      },
+      "parameters": {
+        "direction": "tables"
+      }
+    },
+    {
+      "definition": {
+        "component": "keboola.processor-create-manifest"
+      },
+      "parameters": {
+        "delimiter": ",",
+        "enclosure": "\"",
+        "incremental": false,
+        "primary_key": [],
+        "columns_from": "header"
+      }
+    },
+    {
+      "definition": {
+        "component": "keboola.processor-skip-lines"
+      },
+      "parameters": {
+        "lines": 1
+      }
+    },
+    {
+      "definition": {
+        "component": "keboola.processor-add-row-number-column"
+      },
+      "parameters": {
+        "column_name": "azure_row_number"
+      }
+    },
+    {
+      "definition": {
+        "component": "keboola.processor-add-filename-column"
+      },
+      "parameters": {
+        "column_name": "azure_filename"
+      }
+    }
+  ]
+}
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Run the test suite and lint check using this command:
-
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-docker-compose run --rm test
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Integration
-===========
-
-For information about deployment and integration with KBC, please refer to the
-[deployment section of developers
-documentation](https://developers.keboola.com/extend/component/deployment/)

@@ -1,1 +1,41 @@
-{}
+{
+  "type": "object",
+  "title": "Source",
+  "required": [
+    "file"
+  ],
+  "properties": {
+    "file": {
+      "type": "object",
+      "title": "File",
+      "propertyOrder": 400,
+      "required": [
+        "file_name",
+        "new_files_only",
+        "add_timestamp"
+      ],
+      "properties": {
+        "file_name": {
+          "type": "string",
+          "title": "File Name",
+          "description": "Name of a source file with its extension or wildcard.\nfolder/subfolder/test.csv will download \"test\" CSV file from \"folder/subfolder\" directory\ntest_* will download all CSV files with \"test_\" prefix",
+          "propertyOrder": 300
+        },
+        "new_files_only": {
+          "type": "boolean",
+          "title": "New Files Only",
+          "format": "checkbox",
+          "description": "Every job stores the timestamp of the last downloaded file and a subsequent job can pick up from there.",
+          "propertyOrder": 400
+        },
+        "add_timestamp": {
+          "type": "boolean",
+          "title": "Add Timestamp To Filename",
+          "format": "checkbox",
+          "description": "Add last updated timestamp to the file name",
+          "propertyOrder": 450
+        }
+      }
+    }
+  }
+}

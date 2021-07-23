@@ -1,1 +1,31 @@
-{}
+{
+  "type": "object",
+  "title": "Credentials",
+  "required": [
+    "account_name",
+    "#account_key",
+    "file_system"
+  ],
+  "properties": {
+    "account_name": {
+      "description": "Azure Storage Resources Account Name",
+      "type": "string",
+      "title": "Account Name",
+      "minLength": 1,
+      "propertyOrder": 1
+    },
+    "#account_key": {
+      "description": "Azure Storage Access Key",
+      "type": "string",
+      "title": "Access Key",
+      "propertyOrder": 2
+    },
+    "file_system": {
+      "type": "string",
+      "title": "File System",
+      "description": "Azure DataLake Filesystem Name (Container)",
+      "minLength": 1,
+      "propertyOrder": 4
+    }
+  }
+}

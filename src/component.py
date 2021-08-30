@@ -55,6 +55,7 @@ class Component(ComponentBase):
 
         # Initializing file Container client
         azure_client = AzureDataLakeClient(account_name, account_key, file_system)
+        logging.getLogger("azure").setLevel(logging.WARNING)
 
         file_list = azure_client.list_directory_contents("")
         qualified_file_list = []
@@ -117,7 +118,7 @@ class Component(ComponentBase):
                     qualified_files_short.append(file_name)
 
         logging.info(f'Number of qualified file files: {len(qualified_files)}')
-        logging.debug(f'Qualified Files: {qualified_files_short}')
+        logging.info(f'Qualified Files: {qualified_files_short}')
 
         return qualified_files
 

@@ -20,7 +20,7 @@ class AzureDataLakeClient():
         directory_client = self.file_system_client.get_directory_client(directory)
         out_file = open(result_file.full_path, 'wb')
         file_client = directory_client.get_file_client(file_name)
-        download = file_client.download_file()
+        download = file_client.download_file(timeout=600)
         downloaded_bytes = download.readall()
         out_file.write(downloaded_bytes)
         out_file.close()
